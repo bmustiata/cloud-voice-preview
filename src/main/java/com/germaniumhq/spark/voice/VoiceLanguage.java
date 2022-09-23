@@ -15,6 +15,10 @@ public class VoiceLanguage {
         return new VoiceLanguage(language, language);
     }
 
+    public static VoiceLanguage fromString(String id, String language) {
+        return new VoiceLanguage(id, language);
+    }
+
     public String getId() {
         return id;
     }
