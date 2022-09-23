@@ -111,6 +111,14 @@ public class IbmVoiceProvider implements VoiceProvider {
         String url = buildVoiceListingUrl();
         InputStream resultInputStream = performRestCall(url, null);
 
+        return loadVoiceCharactersFromInputStream(url, resultInputStream);
+    }
+
+    /**
+     * Parses the JSON and creates the VoiceCharacter objects we need with their
+     * assigned VoiceLanguage.
+     */
+    static List<VoiceCharacter> loadVoiceCharactersFromInputStream(String url, InputStream resultInputStream) {
         try {
             IbmVoicesListRequestVo voices = new ObjectMapper()
                     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -121,7 +129,10 @@ public class IbmVoiceProvider implements VoiceProvider {
             for (IbmVoiceDescriptionVo ibmVoice: voices.getVoices()) {
                 String name = getVoiceName(ibmVoice.getName());
                 VoiceLanguage voiceLanguage = VoiceLanguage.fromString(ibmVoice.getLanguage());
-                result.add(new VoiceCharacter(ibmVoice.getName(), name, voiceLanguage));
+                VoiceCharacter voiceCharacter = new VoiceCharacter(ibmVoice.getName(), name, voiceLanguage);
+                voiceCharacter.setDescription(ibmVoice.getDescription());
+
+                result.add(voiceCharacter);
             }
 
             return result;
