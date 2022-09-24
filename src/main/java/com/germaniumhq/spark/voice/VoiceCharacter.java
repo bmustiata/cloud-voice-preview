@@ -1,6 +1,8 @@
 package com.germaniumhq.spark.voice;
 
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class VoiceCharacter {
     private String id; // technical id used in other calls
@@ -10,10 +12,13 @@ public class VoiceCharacter {
 
     private VoiceLanguage voiceLanguage; // voice language of the character
 
+    private Set<VoiceSentiment> sentiments = new LinkedHashSet<>();
+
     public VoiceCharacter(String id, String name, VoiceLanguage voiceLanguage) {
         this.id = id;
         this.name = name;
         this.voiceLanguage = voiceLanguage;
+        this.sentiments.add(VoiceSentiment.DEFAULT);
     }
 
     public String getId() {
@@ -46,6 +51,10 @@ public class VoiceCharacter {
 
     public void setVoiceLanguage(VoiceLanguage voiceLanguage) {
         this.voiceLanguage = voiceLanguage;
+    }
+
+    public Set<VoiceSentiment> getSentiments() {
+        return sentiments;
     }
 
     @Override

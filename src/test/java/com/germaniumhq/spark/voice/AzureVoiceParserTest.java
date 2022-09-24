@@ -7,6 +7,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
 
+import static com.germaniumhq.spark.voice.TestUtils.findCharacterById;
+
 public class AzureVoiceParserTest {
     @Test
     public void verifyIfJsonParsingWorks() throws FileNotFoundException {
@@ -24,19 +26,6 @@ public class AzureVoiceParserTest {
         Assert.assertEquals("Microsoft Server Speech Text to Speech Voice (en-US, JennyNeural)", character.getDescription());
         Assert.assertEquals("en-US", character.getVoiceLanguage().getId());
         Assert.assertEquals("English (United States)", character.getVoiceLanguage().getName());
-    }
-
-    private VoiceCharacter findCharacterById(List<VoiceCharacter> characterList, String chararcterId) {
-        for (VoiceCharacter voiceCharacter: characterList) {
-            if (chararcterId.equals(voiceCharacter.getId())) {
-                return voiceCharacter;
-            }
-        }
-
-        throw new IllegalArgumentException(String.format(
-                "unable to find character %s in %s",
-                chararcterId,
-                characterList
-        ));
+        Assert.assertEquals(15, character.getSentiments().size());
     }
 }

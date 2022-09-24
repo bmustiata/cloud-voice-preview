@@ -20,14 +20,14 @@ public class IbmVoiceParserTest {
 
     @Test
     public void verifyIfJsonLoadingWorks() throws FileNotFoundException {
-        List<VoiceCharacter> result = IbmVoiceProvider.loadVoiceCharactersFromInputStream(
+        List<VoiceCharacter> characterList = IbmVoiceProvider.loadVoiceCharactersFromInputStream(
                 "http://localhost/...",
                 new FileInputStream("src/test/resources/ibm-voice-list.json"));
 
-        Assert.assertNotNull(result);
-        Assert.assertEquals(43, result.size());
+        Assert.assertNotNull(characterList);
+        Assert.assertEquals(43, characterList.size());
 
-        VoiceCharacter character = result.get(0);
+        VoiceCharacter character = TestUtils.findCharacterById(characterList, "fr-FR_NicolasV3Voice");
         Assert.assertEquals("fr-FR_NicolasV3Voice", character.getId());
         Assert.assertEquals("Nicolas (V3)", character.getName());
         Assert.assertEquals("Nicolas: French (français) male voice. Dnn technology.", character.getDescription());

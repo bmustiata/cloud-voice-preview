@@ -109,9 +109,11 @@ public class IbmVoiceProvider implements VoiceProvider {
 
     private List<VoiceCharacter> ibmVoicesListRestCall() {
         String url = buildVoiceListingUrl();
-        InputStream resultInputStream = performRestCall(url, null);
-
-        return loadVoiceCharactersFromInputStream(url, resultInputStream);
+        try (InputStream resultInputStream = performRestCall(url, null)) {
+            return loadVoiceCharactersFromInputStream(url, resultInputStream);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("unable to read " + url, e);
+        }
     }
 
     /**
@@ -157,6 +159,10 @@ public class IbmVoiceProvider implements VoiceProvider {
 
         HttpRequest request = builder.build();
 
+        return performHttpRequest(url, request);
+    }
+
+    public static InputStream performHttpRequest(String url, HttpRequest request) {
         try {
             HttpResponse<InputStream> response = HttpClient.newBuilder()
                     .build()

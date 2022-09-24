@@ -16,6 +16,7 @@ public class Main {
 
     static {
         voiceProviders.add(new IbmVoiceProvider());
+        voiceProviders.add(new AzureVoiceProvider());
     }
 
     public static void main(String[] args) {
