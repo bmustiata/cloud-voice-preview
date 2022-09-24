@@ -20,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class IbmVoiceProvider implements VoiceProvider {
-    static Pattern IBM_VOICE_RE = Pattern.compile("^(\\w+-\\w+)_(.+?)(V\\d+)?Voice$");
+    static Pattern IBM_VOICE_RE = Pattern.compile("^(\\w+-\\w+)_(.+?)(V\\d+)?(Voice)?$");
 
     private Map<VoiceLanguage, List<VoiceCharacter>> voices;
 

@@ -17,7 +17,7 @@ public class AzureVoiceProvider implements VoiceProvider {
 
     @Override
     public String getProviderName() {
-        return "Azure'";
+        return "Azure";
     }
 
     @Override
