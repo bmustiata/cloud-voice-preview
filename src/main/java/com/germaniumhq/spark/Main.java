@@ -30,15 +30,6 @@ public class Main {
         tabs.add("voice", createVoicePanel());
         tabs.add("settings", createSettingsPanel());
 
-        JPanel toolbar = new JPanel();
-        toolbar.setLayout(new BoxLayout(toolbar, BoxLayout.X_AXIS));
-        JButton play = new JButton("play");
-        play.addActionListener(($) -> {
-            onPlayClicked();
-        });
-        toolbar.add(play);
-
-        sectionFrame.getContentPane().add(toolbar, BorderLayout.NORTH);
         sectionFrame.getContentPane().add(tabs, BorderLayout.CENTER);
 
         sectionFrame.setVisible(true); // frame visible

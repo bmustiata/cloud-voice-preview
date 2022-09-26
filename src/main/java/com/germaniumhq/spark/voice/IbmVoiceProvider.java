@@ -170,7 +170,7 @@ public class IbmVoiceProvider implements VoiceProvider {
 
             if (response.statusCode() / 100 != 2) {
                 throw new IllegalArgumentException(String.format(
-                        "unable ot read voices list from %s, return code: %d",
+                        "failure calling %s, return code: %d",
                         url, response.statusCode()
                 ));
             }

@@ -12,6 +12,8 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.util.*;
 
+import static com.germaniumhq.spark.voice.UriUtil.createUri;
+
 public class AzureVoiceProvider implements VoiceProvider {
     private Map<VoiceLanguage, List<VoiceCharacter>> voices;
 
@@ -35,7 +37,7 @@ public class AzureVoiceProvider implements VoiceProvider {
         // https://germanywestcentral.tts.speech.microsoft.com/cognitiveservices/voices/list
         String azureEndpoint = Settings.INSTANCE.getAzureEndpoint();
 
-        HttpRequest httpRequest = createHttpRequest(azureEndpoint);
+        HttpRequest httpRequest = createListVoicesHttpRequest(azureEndpoint);
 
         try (InputStream inputStream = IbmVoiceProvider.performHttpRequest(azureEndpoint, httpRequest)) {
             return loadVoiceCharactersFromInputStream(azureEndpoint, inputStream);
@@ -57,13 +59,56 @@ public class AzureVoiceProvider implements VoiceProvider {
 
     @Override
     public List<VoiceSentiment> getAvailableSentiments(VoiceCharacter voiceCharacter) {
+        if (voiceCharacter == null) {
+            return Collections.singletonList(VoiceSentiment.DEFAULT);
+        }
+
         return new ArrayList<>(voiceCharacter.getSentiments());
     }
 
 
     @Override
     public InputStream renderVoice(VoiceCharacter character, VoiceSentiment sentiment, float pitchMultiplier, String text) {
-        return null;
+        String xmlContent = createXmlContent(character, sentiment, pitchMultiplier, text);
+
+        URI uri = createUri(Settings.INSTANCE.getAzureEndpoint(), "/v1");
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(xmlContent))
+                .uri(uri)
+                .header("Ocp-Apim-Subscription-Key", Settings.INSTANCE.getAzureToken())
+                .header("Content-Type", "application/ssml+xml")
+                .header("X-Microsoft-OutputFormat", "audio-16khz-128kbitrate-mono-mp3");
+
+        HttpRequest request = builder.build();
+
+        return IbmVoiceProvider.performHttpRequest(uri.toString(), request);
+    }
+
+    private String createXmlContent(VoiceCharacter character, VoiceSentiment sentiment, float pitchMultiplier, String text) {
+        StringBuilder result = new StringBuilder();
+
+        result.append("<speak version='1.0' xml:lang='en-UK' xmlns:mstts=\"https://www.w3.org/2001/mstts\" >")
+                .append("<voice name='")
+                .append(character.getId())
+                .append("'>");
+
+        if (sentiment != null && sentiment != VoiceSentiment.DEFAULT) {
+            result.append("<mstts:express-as style=\"")
+                    .append(sentiment.getId())
+                    .append("\">");
+        }
+
+        result.append("<![CDATA[")
+                .append(text)
+                .append("]]>");
+
+        if (sentiment != null && sentiment != VoiceSentiment.DEFAULT) {
+            result.append("</mstts:express-as>");
+        }
+
+        result.append("</voice></speak>");
+
+        return result.toString();
     }
 
     public static List<VoiceCharacter> loadVoiceCharactersFromInputStream(String url, InputStream resultInputStream) {
@@ -99,9 +144,9 @@ public class AzureVoiceProvider implements VoiceProvider {
      * @param azureEndpoint
      * @return
      */
-    private static HttpRequest createHttpRequest(String azureEndpoint) {
+    private static HttpRequest createListVoicesHttpRequest(String azureEndpoint) {
         HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create(azureEndpoint))
+                .uri(createUri(azureEndpoint, "/voices/list"))
                 .header("Ocp-Apim-Subscription-Key", Settings.INSTANCE.getAzureToken())
                 .GET()
                 .build();
