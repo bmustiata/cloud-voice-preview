@@ -47,6 +47,10 @@ public class IbmVoiceProvider implements VoiceProvider {
 
     @Override
     public List<VoiceCharacter> getAvailableCharacters(VoiceLanguage language) {
+        if (language == null) {
+            return Collections.emptyList();
+        }
+
         return this.voices.get(language);
     }
 
