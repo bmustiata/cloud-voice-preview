@@ -47,6 +47,7 @@ public class Main {
         JComboBox<VoiceLanguage> voiceLanguageComboBox = new JComboBox<>();
         JComboBox<VoiceCharacter> voiceCharacterComboBox = new JComboBox<>();
         JComboBox<VoiceSentiment> voiceSentimentComboBox = new JComboBox<>();
+        JLabel voiceLabel = new JLabel();
         JButton playButton = new JButton("play");
         JTextArea textTextArea = new JTextArea();
 
@@ -76,6 +77,10 @@ public class Main {
             voiceSentimentComboBox.removeAllItems();
             sentiments.forEach(voiceSentimentComboBox::addItem);
             voiceSentimentComboBox.invalidate();
+
+            if (selectedVoiceCharacter != null) {
+                voiceLabel.setText(selectedVoiceCharacter.getId());
+            }
         });
 
         voiceSentimentComboBox.addActionListener(e -> {
@@ -112,6 +117,7 @@ public class Main {
         result.add(textTextArea, constraints);
 
         result.add(playButton, labelColumn(0, 5));
+        result.add(voiceLabel, labelColumn(1, 5));
 
         return result;
     }
