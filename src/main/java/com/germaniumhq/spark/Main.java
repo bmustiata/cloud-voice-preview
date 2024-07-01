@@ -5,6 +5,11 @@ import com.germaniumhq.spark.voice.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,10 +40,6 @@ public class Main {
         sectionFrame.setVisible(true); // frame visible
     }
 
-    private static void onPlayClicked() {
-        System.out.println("play clicked");
-    }
-
     private static JComponent createVoicePanel() {
         JPanel result = new JPanel();
         result.setLayout(new GridBagLayout());
@@ -48,7 +49,7 @@ public class Main {
         JComboBox<VoiceCharacter> voiceCharacterComboBox = new JComboBox<>();
         JComboBox<VoiceSentiment> voiceSentimentComboBox = new JComboBox<>();
         JLabel voiceLabel = new JLabel();
-        JButton playButton = new JButton("play");
+        JButton playSaveButton = new JButton("▶️& \uD83D\uDCBE");
         JTextArea textTextArea = new JTextArea();
 
         voiceProviders.forEach(voiceProviderComboBox::addItem);
@@ -87,11 +88,22 @@ public class Main {
             selectedVoiceSentiment = (VoiceSentiment) voiceSentimentComboBox.getSelectedItem();
         });
 
-        playButton.addActionListener(e -> {
-            SoundMediaPlayer soundMEdiaplayer = new SoundMediaPlayer();
-            soundMEdiaplayer.play(selectedVoiceProvider.renderVoice(selectedVoiceCharacter, selectedVoiceSentiment, 1f, textTextArea.getText()));
-        });
+        playSaveButton.addActionListener(e -> {
+            try (InputStream inputStream = selectedVoiceProvider.renderVoice(selectedVoiceCharacter, selectedVoiceSentiment, 1f, textTextArea.getText())) {
+                SoundMediaPlayer soundMediaplayer = new SoundMediaPlayer();
+                byte[] data = inputStream.readAllBytes();
 
+                Path targetFolder = Paths.get(System.getProperty("user.home"));
+                Path targetPath = targetFolder.resolve("tts-to-voice.mp3");
+                Files.write(targetPath, data, StandardOpenOption.CREATE);
+
+                System.out.println("wrote: " + targetPath);
+
+                soundMediaplayer.play(data);
+            } catch (Exception ex) {
+                throw new IllegalStateException(ex);
+            }
+        });
 
         // layout things in the page
         result.add(new JLabel("Provider:"), labelColumn(0, 0));
@@ -116,7 +128,7 @@ public class Main {
         textTextArea.setLineWrap(true);
         result.add(textTextArea, constraints);
 
-        result.add(playButton, labelColumn(0, 5));
+        result.add(playSaveButton, labelColumn(0, 5));
         result.add(voiceLabel, labelColumn(1, 5));
 
         return result;

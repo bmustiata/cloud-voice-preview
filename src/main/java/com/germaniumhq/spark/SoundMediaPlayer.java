@@ -5,6 +5,7 @@ import javazoom.jl.player.Player;
 
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -15,6 +16,14 @@ public class SoundMediaPlayer implements LineListener {
     public synchronized void play(InputStream inputStream) {
         try {
             new Player(inputStream).play();
+        } catch (JavaLayerException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public synchronized void play(byte[] data) {
+        try {
+            new Player(new ByteArrayInputStream(data)).play();
         } catch (JavaLayerException e) {
             throw new RuntimeException(e);
         }
